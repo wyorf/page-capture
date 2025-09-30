@@ -31,20 +31,18 @@ The entire process runs **locally**, without additional Chromium downloads when 
 #### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/wyorf/page-capture.git
+cd page-capture
 ```
 
 #### 2. Build the Docker image
-```docker build -t page-capture . ```
+```docker build -t page-capture ./scraper```
 
 #### 3. Run the container
 ```docker run --rm -e URL="https://example.com" -v "$(pwd)/out:/output" page-capture```
-
-
 The JSON output is printed to stdout and saved to /output/page_text.json.
 
-#### 4. Optional screenshot
+#### 4. Optional screenshot (mainly for debug)
 ```docker run --rm -e URL="https://example.com" -e TAKE_SCREENSHOT=1 -v "$(pwd)/out:/output" page-capture```
 
 The page screenshot is saved to /output/page_screenshot.png.
