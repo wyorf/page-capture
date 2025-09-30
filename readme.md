@@ -87,8 +87,8 @@ The page screenshot is saved to /output/page_screenshot.png.
 #### 1. Клонувати репозиторій
 
 ```bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/wyorf/page-capture.git
+cd page-capture
 ```
 
 #### 2. Побудувати Docker образ
