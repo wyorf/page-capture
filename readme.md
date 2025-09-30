@@ -36,16 +36,16 @@ cd <repository-folder>
 ```
 
 #### 2. Build the Docker image
-```docker build -t page-capture-final . ```
+```docker build -t page-capture . ```
 
 #### 3. Run the container
-```docker run --rm -e URL="https://example.com" -v "$(pwd)/out:/output" page-capture-final```
+```docker run --rm -e URL="https://example.com" -v "$(pwd)/out:/output" page-capture```
 
 
 The JSON output is printed to stdout and saved to /output/page_text.json.
 
 #### 4. Optional screenshot
-```docker run --rm -e URL="https://example.com" -e TAKE_SCREENSHOT=1 -v "$(pwd)/out:/output" page-capture-final```
+```docker run --rm -e URL="https://example.com" -e TAKE_SCREENSHOT=1 -v "$(pwd)/out:/output" page-capture```
 
 The page screenshot is saved to /output/page_screenshot.png.
 
@@ -94,16 +94,16 @@ cd <repository-folder>
 ```
 
 #### 2. Побудувати Docker образ
-```docker build -t page-capture-final .```
+```docker build -t page-capture .```
 
 #### 3. Запуск контейнера
-```docker run --rm -e URL="https://example.com" -v "$(pwd)/out:/output" page-capture-final```
+```docker run --rm -e URL="https://example.com" -v "$(pwd)/out:/output" page-capture```
 
 
 JSON виводиться у stdout та зберігається у /output/page_text.json.
 
 #### 4. Опціональний скриншот
-```docker run --rm -e URL="https://example.com" -e TAKE_SCREENSHOT=1 -v "$(pwd)/out:/output" page-capture-final```
+```docker run --rm -e URL="https://example.com" -e TAKE_SCREENSHOT=1 -v "$(pwd)/out:/output" page-capture```
 
 
 Скриншот сторінки зберігається у /output/page_screenshot.png.
