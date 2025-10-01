@@ -1,15 +1,17 @@
 import os
-import json
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from urllib.parse import urlparse, parse_qs
 
 def main():
     url = os.getenv("URL")
     if not url:
-        print(json.dumps({"error": "URL not set"}))
-        return
+        raise ValueError("Змінна URL не задана")
 
+    # Налаштування браузера для запуска в Docker
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
@@ -17,48 +19,52 @@ def main():
     options.binary_location = "/usr/bin/chromium"  # системний Chromium
 
     driver = webdriver.Chrome(options=options)
-    driver.get(url)
 
-    # Чекаємо, поки body містить текст
     try:
-        WebDriverWait(driver, 15).until(
-            lambda d: len(d.find_element("tag name", "body").text.strip()) > 0
+        driver.get(url)
+        
+        #print("Посилання:", url)
+        
+        button_text = "Streaming widget"
+
+        # Ищем кнопку по тексту и кликаем
+        button = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((
+                By.XPATH,
+                f"//div[contains(@class,'widget-button-icon-text') "
+                f"and normalize-space(text())='{button_text}']"
+                f"/ancestor::div[@class='widget-button']"
+            ))
         )
-    except Exception:
-        pass  # таймаут пройшов, беремо те, що є
 
-    # JS: збираємо текст по класах елементів
-    script = """
-    const elements = document.querySelectorAll('[class]');
-    const result = {};
-    elements.forEach(el => {
-        const classes = el.className.trim();
-        const text = el.innerText.replace(/\\s+/g, ' ').trim();
-        if (text) {
-            if (result[classes]) {
-                if (Array.isArray(result[classes])) result[classes].push(text);
-                else result[classes] = [result[classes], text];
-            } else {
-                result[classes] = text;
-            }
-        }
-    });
-    return result;
-    """
-    result = driver.execute_script(script)
+        #print("Кнопка:", button)
 
-    # Опціональний скріншот
-    if os.getenv("TAKE_SCREENSHOT", "0") == "1":
-        driver.save_screenshot("/output/page_screenshot.png")
+        original_windows = driver.window_handles
+        # button.click()
+        driver.execute_script("arguments[0].click();", button)
 
-    # Зберігаємо JSON
-    json_path = "/output/page_text.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+        # Ждём новое окно
+        WebDriverWait(driver, 10).until(
+            EC.new_window_is_opened(original_windows)
+        )
 
-    # Вивід у stdout (чистий JSON)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-    driver.quit()
+        # Переходимо на нове окно
+        new_window = [w for w in driver.window_handles if w not in original_windows][0]
+        driver.switch_to.window(new_window)
+
+        new_url = driver.current_url
+        #print("Посилання з нового окна:", new_url)
+        
+        # Парсим longJarId
+        parsed = urlparse(new_url)
+        params = parse_qs(parsed.query)
+        longJarId = params.get("longJarId", [None])[0]
+
+        print(longJarId)
+
+    finally:
+        driver.quit()
+
 
 if __name__ == "__main__":
     main()
